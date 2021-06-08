@@ -1,10 +1,15 @@
+/*
+ * @description:
+ * @Author: OriX
+ * @LastEditors: OriX
+ */
 import request from '@/utils/request';
-export async function fakeAccountLogin(params) {
-  return request('/api/login/account', {
+export async function fakeAccountLogin (params) {
+  return request('/api/auth/login/', {
     method: 'POST',
     data: params,
   });
 }
-export async function getFakeCaptcha(mobile) {
+export async function getFakeCaptcha (mobile) {
   return request(`/api/login/captcha?mobile=${mobile}`);
 }
