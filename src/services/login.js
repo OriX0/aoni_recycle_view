@@ -4,8 +4,9 @@
  * @LastEditors: OriX
  */
 import request from '@/utils/request';
-export async function fakeAccountLogin (params) {
-  return request('/api/auth/login/', {
+
+export async function accountLogin (params) {
+  return request('/auth/login/', {
     method: 'POST',
     data: params,
   });
