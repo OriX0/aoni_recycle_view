@@ -1,3 +1,8 @@
+/*
+ * @Description:
+ * @Author: OriX
+ * @LastEditors: OriX
+ */
 /** Request 网络请求工具 更详细的 api 文档: https://github.com/umijs/umi-request */
 import { extend } from 'umi-request';
 import { notification } from 'antd';
@@ -26,7 +31,6 @@ const codeMessage = {
 
 const errorHandler = async (error) => {
   const { response } = error;
-
   if (response) {
     const result = await response.json();
     const errorText = result.message || codeMessage[response.status] || response.statusText;
@@ -52,19 +56,29 @@ const errorHandler = async (error) => {
 const request = extend({
   errorHandler,
   credentials: 'include', // 是否带上cookie
-  prefix: '/api' // 设置请求前缀
+  prefix: '/api', // 设置请求前缀
 });
 
 // 请求拦截器 在头部加上 jwt token
 request.interceptors.request.use((url, options) => {
   // 获取JWT Token
-  const token = ''
+  const token = '';
   const headers = {
-    Authorization: `Bearer ${token}`
-  }
+    Authorization: `Bearer ${token}`,
+  };
   return {
     url,
     options: { ...options, headers },
   };
 });
+// 响应拦截器 一旦在响应里面有 acc_token相关的数据 则更新本地储存的acc token
+request.interceptors.response.use(async (response) => {
+  const result = await response.clone().json();
+  const token = result.data?.access_token;
+  const expireIn = result.data?.expires_in;
+  localStorage.setItem('ori_acc_token', token);
+  localStorage.setItem('expire_in', expireIn);
+  return response;
+});
+
 export default request;
