@@ -62,7 +62,7 @@ const request = extend({
 // 请求拦截器 在头部加上 jwt token
 request.interceptors.request.use((url, options) => {
   // 获取JWT Token
-  const token = '';
+  const token = localStorage.getItem('ori_acc_token');
   const headers = {
     Authorization: `Bearer ${token}`,
   };
@@ -76,8 +76,11 @@ request.interceptors.response.use(async (response) => {
   const result = await response.clone().json();
   const token = result.data?.access_token;
   const expireIn = result.data?.expires_in;
-  localStorage.setItem('ori_acc_token', token);
-  localStorage.setItem('expire_in', expireIn);
+  if (token && expireIn) {
+    localStorage.setItem('ori_acc_token', token);
+    localStorage.setItem('expire_in', expireIn);
+  }
+
   return response;
 });
 

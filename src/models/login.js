@@ -1,6 +1,5 @@
-import { stringify } from 'querystring';
 import { history } from 'umi';
-import { accountLogin } from '@/services/login';
+import { accountLogin, accountLogout } from '@/services/login';
 import { getPageQuery } from '@/utils/utils';
 import { message } from 'antd';
 
@@ -44,17 +43,15 @@ const Model = {
       }
     },
 
-    logout() {
-      const { redirect } = getPageQuery(); // Note: There may be security issues, please note
-
-      if (window.location.pathname !== '/user/login' && !redirect) {
-        history.replace({
-          pathname: '/user/login',
-          search: stringify({
-            redirect: window.location.href,
-          }),
-        });
+    *logout(_, { call }) {
+      const response = yield call(accountLogout);
+      // 如果退出成功
+      if (response.errCode === 0) {
+        // 清除所有localStorage数据
+        localStorage.clear();
       }
+      // 重定向到登录页
+      history.replace('/user/login');
     },
   },
   reducers: {
