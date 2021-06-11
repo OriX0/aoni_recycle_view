@@ -1,3 +1,8 @@
+/*
+ * @Description: 路由配置
+ * @Author: OriX
+ * @LastEditors: OriX
+ */
 export default [
   {
     path: '/',
@@ -27,10 +32,17 @@ export default [
                 path: '/',
               },
               {
+                path: '/userList',
+                name: 'userList',
+                icon: 'TeamOutlined',
+                component: '@/Pages/UserList',
+              },
+              {
                 component: './404',
               },
             ],
           },
+
           {
             component: './404',
           },
