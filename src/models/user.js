@@ -1,4 +1,5 @@
-import { queryCurrent, query as queryUsers } from '@/services/user';
+import { query as queryUsers } from '@/services/user';
+
 const UserModel = {
   namespace: 'user',
   state: {
@@ -13,11 +14,11 @@ const UserModel = {
       });
     },
 
-    *fetchCurrent(_, { call, put }) {
-      const response = yield call(queryCurrent);
+    *fetchCurrent(_, { put }) {
+      const currentUserInfo = JSON.parse(localStorage.getItem('currentUser'));
       yield put({
         type: 'saveCurrentUser',
-        payload: response,
+        payload: currentUserInfo,
       });
     },
   },
