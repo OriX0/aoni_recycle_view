@@ -2,33 +2,54 @@ import React, { useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Avatar, Switch } from 'antd';
-import { getUserList } from '@/services/user';
+import { Button, Avatar, Switch, message } from 'antd';
+import { getUserList, changeUserLock, resetUserPwd } from '@/services/user';
+import { UserOutlined } from '@ant-design/icons';
 
 export default function index() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const actionRef = useRef();
   // 获取用户列表
-  const getUserData = async function ({ params }) {
-    console.log(params);
+  const getUserData = async (params) => {
     const response = await getUserList(params);
     console.log('response: ', response);
     return {
-      data: response.data?.userList || [],
+      data: response.data.userList || [],
       success: true,
-      total: response.data?.count || 0,
+      total: response.data.count || 0,
     };
+  };
+  // 修改用户的禁用和启用
+  const handleChangeLock = async (userName, newLock) => {
+    const response = await changeUserLock(userName, newLock);
+    if (response.errCode === 0) {
+      message.success('操作成功');
+    } else {
+      message.error(response.message);
+    }
+  };
+  // 重置用户密码
+  const handleResetPwd = async (userName) => {
+    const response = await resetUserPwd(userName);
+    if (response.errCode === 0) {
+      message.success(`密码已重置----${response.data.newPassword}`);
+    } else {
+      message.error(response.message);
+    }
   };
   const columns = [
     {
       title: 'id',
       dataIndex: 'id',
+      hideInSearch: true,
     },
     {
       title: '头像',
       dataIndex: 'avatar',
       hideInSearch: true,
-      render: (_, record) => [<Avatar key={record.id} size={64} src={record.avatar} />],
+      render: (_, record) => [
+        <Avatar key={record.id} size={64} src={record.avatar} icon={<UserOutlined />} />,
+      ],
     },
     {
       title: '工号',
@@ -36,8 +57,7 @@ export default function index() {
     },
     {
       title: '真实名字',
-      dataIndex: 'relaName',
-      hideInSearch: true,
+      dataIndex: 'realName',
     },
     {
       title: '所属城市',
@@ -52,7 +72,10 @@ export default function index() {
           key={record.id}
           checkedChildren="锁定"
           unCheckedChildren="正常"
-          defaultChecked={record.is_locked === 1}
+          defaultChecked={+record.is_locked === 1}
+          onChange={(checked) => {
+            handleChangeLock(record.userName, +checked);
+          }}
         />,
       ],
     },
@@ -60,7 +83,16 @@ export default function index() {
       title: '操作',
       dataIndex: 'userName',
       hideInSearch: true,
-      render: (_, record) => [<a key={record.id}>重置密码 </a>],
+      render: (_, record) => [
+        <a
+          key={record.id}
+          onClick={() => {
+            handleResetPwd(record.userName);
+          }}
+        >
+          重置密码{' '}
+        </a>,
+      ],
     },
   ];
   return (
@@ -69,9 +101,7 @@ export default function index() {
         columns={columns}
         actionRef={actionRef}
         request={(params = {}) => {
-          getUserData(params);
-          // eslint-disable-next-line no-console
-          console.log(params);
+          return getUserData(params);
         }}
         editable={{
           type: 'multiple',
