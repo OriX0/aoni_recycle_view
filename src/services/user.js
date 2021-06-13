@@ -40,3 +40,13 @@ export async function resetUserPwd(userName) {
     method: 'PATCH',
   });
 }
+/**
+ * 添加用户
+ * @param  params 添加的用户的配置对象
+ */
+export async function addUser(params) {
+  return request(`/admin/users`, {
+    method: 'post',
+    data: params,
+  });
+}

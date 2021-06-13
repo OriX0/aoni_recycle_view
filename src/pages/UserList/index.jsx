@@ -1,14 +1,26 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable from '@ant-design/pro-table';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Avatar, Switch, message } from 'antd';
 import { getUserList, changeUserLock, resetUserPwd } from '@/services/user';
 import { UserOutlined } from '@ant-design/icons';
+import CreateOrEditModel from './components/createOrEditModel';
 
-export default function index() {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+export default function Index() {
   const actionRef = useRef();
+  // 状态---储存是否显示模态框
+  const [isShowModel, setModelShow] = useState(false);
+  // 修改状态---
+  const handleChangeModelVisible = (show, id = undefined) => {
+    if (id) {
+      // 设置 编辑的表单的id 这里暂时不需要
+      setModelShow(show);
+    } else {
+      // 这里也需要再设置id
+      setModelShow(show);
+    }
+  };
   // 获取用户列表
   const getUserData = async (params) => {
     const response = await getUserList(params);
@@ -116,11 +128,27 @@ export default function index() {
         dateFormatter="string"
         headerTitle="高级表格"
         toolBarRender={() => [
-          <Button key="button" icon={<PlusOutlined />} type="primary">
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              handleChangeModelVisible(true);
+            }}
+            type="primary"
+          >
             新建
           </Button>,
         ]}
       />
+      {isShowModel ? (
+        <CreateOrEditModel
+          isShowModel={isShowModel}
+          changeModelVisible={handleChangeModelVisible}
+          actionRef={actionRef}
+        />
+      ) : (
+        ''
+      )}
     </PageContainer>
   );
 }
