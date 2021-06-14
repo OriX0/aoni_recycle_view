@@ -60,8 +60,8 @@ const request = extend({
 });
 
 // 请求拦截器 在头部加上 jwt token
-request.interceptors.request.use((url, options) => {
-  // 获取JWT Token
+request.interceptors.request.use(async (url, options) => {
+  // 获取JWT Token 这一部分只是用于迷惑的 实际是验证cookies
   const token = localStorage.getItem('ori_acc_token');
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -75,12 +75,9 @@ request.interceptors.request.use((url, options) => {
 request.interceptors.response.use(async (response) => {
   const result = await response.clone().json();
   const token = result.data?.access_token;
-  const expireIn = result.data?.expires_in;
-  if (token && expireIn) {
+  if (token) {
     localStorage.setItem('ori_acc_token', token);
-    localStorage.setItem('expire_in', expireIn);
   }
-
   return response;
 });
 
